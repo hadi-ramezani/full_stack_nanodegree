@@ -15,9 +15,13 @@ def get_most_popular_articles():
     db = psycopg2.connect(database=DBNAME)
 
     c = db.cursor()
-    c.execute("select articles.title, count(*) as hit from log, articles "
-              "where substring(log.path, 10) = articles.slug "
-              "group by articles.title order by hit desc limit 3")
+    c.execute("""
+    SELECT articles.title, count(*) AS hit from log, articles
+    WHERE substring(log.path, 10) = articles.slug
+    GROUP BY articles.title
+    ORDER BY hit DESC
+    LIMIT 3
+    """)
 
     articles = c.fetchall()
     for i, article in enumerate(articles):
@@ -34,13 +38,17 @@ def get_most_popular_authors():
     db = psycopg2.connect(database=DBNAME)
 
     c = db.cursor()
-    c.execute("select authors.name, count(*) as hit from articles, authors, log"
-              " where  articles.author = authors.id and substring(log.path, 10) "
-              "= articles.slug group by authors.name order by hit desc limit 3")
+    c.execute("""
+    SELECT authors.name, count(*) AS hit from articles, authors, log
+    WHERE  articles.author = authors.id and substring(log.path, 10) = articles.slug
+    GROUP BY authors.name 
+    ORDER BY hit DESC
+    LIMIT 3
+    """)
 
     authors = c.fetchall()
-    for i, author in enumerate(authors):
-        print("{0}. '{1}' --- {2} views".format(i + 1, author[0], author[1]))
+    for i, author in enumerate(authors, 1):
+        print("{0}. '{1}' --- {2} views".format(i, author[0], author[1]))
 
 
 def get_high_error_days():
@@ -49,19 +57,26 @@ def get_high_error_days():
 
     :return: None
     """
-
     # create view status_days as select status, date_part('day', time) as day from log;
     print("Finding days with more than 1% error rate")
 
     db = psycopg2.connect(database=DBNAME)
 
     c = db.cursor()
-    c.execute("select ok_table.day, (error_table.error_count::decimal/ok_table.ok_count)*100"
-              " as rate from (select day, count(*) as ok_count from status_days "
-              "where status='200 OK' group by day) as ok_table, "
-              "(select day, count(*) as error_count from status_days "
-              "where status='404 NOT FOUND' group by day)"
-              " as error_table where ok_table.day = error_table.day order by rate desc")
+    c.execute("""
+    SELECT ok_table.day, (error_table.error_count::decimal/(ok_table.ok_count+error_table.error_count))*100 
+    AS rate  
+    FROM (select day, count(*) AS ok_count 
+    FROM status_days 
+    WHERE status='200 OK' 
+    GROUP BY day) AS ok_table,  
+    (SELECT day, count(*) AS error_count 
+    FROM status_days 
+    WHERE status='404 NOT FOUND' 
+    GROUP BY day) AS error_table 
+    WHERE ok_table.day = error_table.day 
+    ORDER BY rate DESC 
+    """)
 
     days_errors = c.fetchall()
     for item in days_errors:
