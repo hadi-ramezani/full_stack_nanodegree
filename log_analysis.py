@@ -6,7 +6,8 @@ DBNAME = "news"
 
 
 def get_query_results(database_name, query):
-    """A helper function to connect to a database, make a query and return the results
+    """A helper function to connect to a database, make a query and return
+     the results
 
     :param database_name: the name of the database
     :param query: the text of the query
@@ -30,7 +31,7 @@ def get_most_popular_articles():
 
     query = """
     SELECT articles.title, count(*) AS hit from log, articles
-    WHERE '/article/' || articles.slug = log.path 
+    WHERE '/article/' || articles.slug = log.path
     GROUP BY articles.title
     ORDER BY hit DESC
     LIMIT 3
@@ -51,8 +52,9 @@ def get_most_popular_authors():
 
     query = """
     SELECT authors.name, count(*) AS hit from articles, authors, log
-    WHERE  articles.author = authors.id and '/article/' || articles.slug = log.path 
-    GROUP BY authors.name 
+    WHERE  articles.author = authors.id and '/article/' || articles.slug
+     = log.path
+    GROUP BY authors.name
     ORDER BY hit DESC
     LIMIT 3
     """
@@ -68,21 +70,21 @@ def get_high_error_days():
 
     :return: None
     """
-    # create view status_days as select status, date_part('day', time) as day from log;
     print("Finding days with more than 1% error rate")
     query = """
-    SELECT date, rate FROM 
-    (SELECT ok_table.date, (error_table.error_count::decimal/(ok_table.ok_count+error_table.error_count))*100 
-    AS rate  
-    FROM (select date, count(*) AS ok_count 
-    FROM status_date 
-    WHERE status='200 OK' 
-    GROUP BY date) AS ok_table,  
-    (SELECT date, count(*) AS error_count 
-    FROM status_date 
-    WHERE status='404 NOT FOUND' 
-    GROUP BY date) AS error_table 
-    WHERE ok_table.date = error_table.date) AS rates_table 
+    SELECT date, rate FROM
+    (SELECT ok_table.date, (error_table.error_count::decimal/
+    (ok_table.ok_count+error_table.error_count))*100
+    AS rate
+    FROM (select date, count(*) AS ok_count
+    FROM status_date
+    WHERE status='200 OK'
+    GROUP BY date) AS ok_table,
+    (SELECT date, count(*) AS error_count
+    FROM status_date
+    WHERE status='404 NOT FOUND'
+    GROUP BY date) AS error_table
+    WHERE ok_table.date = error_table.date) AS rates_table
     WHERE rate >= 1
     """
     date_errors = get_query_results(DBNAME, query)
