@@ -6,6 +6,12 @@ DBNAME = "news"
 
 
 def get_query_results(database_name, query):
+    """A helper function to connect to a database, make a query and return the results
+
+    :param database_name: the name of the database
+    :param query: the text of the query
+    :return: the query results
+    """
     db = psycopg2.connect(database=database_name)
 
     c = db.cursor()
