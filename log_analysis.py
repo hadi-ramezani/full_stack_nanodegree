@@ -5,6 +5,15 @@ import psycopg2
 DBNAME = "news"
 
 
+def get_query_results(database_name, query):
+    db = psycopg2.connect(database=database_name)
+
+    c = db.cursor()
+    c.execute(query)
+
+    return c.fetchall()
+
+
 def get_most_popular_articles():
     """Compute the three most popular articles and print their title and the
     number of views
@@ -12,18 +21,16 @@ def get_most_popular_articles():
     :return: None
     """
     print("Calculating three most popular articles of all time")
-    db = psycopg2.connect(database=DBNAME)
 
-    c = db.cursor()
-    c.execute("""
+    query = """
     SELECT articles.title, count(*) AS hit from log, articles
     WHERE '/article/' || articles.slug = log.path 
     GROUP BY articles.title
     ORDER BY hit DESC
     LIMIT 3
-    """)
+    """
+    articles = get_query_results(DBNAME, query)
 
-    articles = c.fetchall()
     for i, (title, view) in enumerate(articles):
         print("{0}. '{1}' --- {2} views".format(i + 1, title, view))
 
@@ -35,18 +42,16 @@ def get_most_popular_authors():
     :return: None
     """
     print("Calculating three most popular articles authors of all time")
-    db = psycopg2.connect(database=DBNAME)
 
-    c = db.cursor()
-    c.execute("""
+    query = """
     SELECT authors.name, count(*) AS hit from articles, authors, log
     WHERE  articles.author = authors.id and '/article/' || articles.slug = log.path 
     GROUP BY authors.name 
     ORDER BY hit DESC
     LIMIT 3
-    """)
+    """
+    authors = get_query_results(DBNAME, query)
 
-    authors = c.fetchall()
     for i, author in enumerate(authors, 1):
         print("{0}. '{1}' --- {2} views".format(i, author[0], author[1]))
 
@@ -59,11 +64,7 @@ def get_high_error_days():
     """
     # create view status_days as select status, date_part('day', time) as day from log;
     print("Finding days with more than 1% error rate")
-
-    db = psycopg2.connect(database=DBNAME)
-
-    c = db.cursor()
-    c.execute("""
+    query = """
     SELECT ok_table.day, (error_table.error_count::decimal/(ok_table.ok_count+error_table.error_count))*100 
     AS rate  
     FROM (select day, count(*) AS ok_count 
@@ -76,9 +77,9 @@ def get_high_error_days():
     GROUP BY day) AS error_table 
     WHERE ok_table.day = error_table.day 
     ORDER BY rate DESC 
-    """)
+    """
+    days_errors = get_query_results(DBNAME, query)
 
-    days_errors = c.fetchall()
     for item in days_errors:
         if item[1] > 1:
             print("The error rate on July {0}, 2016 was {1:.2f}%".format(int(item[0]), item[1]))
