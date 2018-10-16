@@ -71,24 +71,24 @@ def get_high_error_days():
     # create view status_days as select status, date_part('day', time) as day from log;
     print("Finding days with more than 1% error rate")
     query = """
-    SELECT ok_table.day, (error_table.error_count::decimal/(ok_table.ok_count+error_table.error_count))*100 
+    SELECT date, rate FROM 
+    (SELECT ok_table.date, (error_table.error_count::decimal/(ok_table.ok_count+error_table.error_count))*100 
     AS rate  
-    FROM (select day, count(*) AS ok_count 
-    FROM status_days 
+    FROM (select date, count(*) AS ok_count 
+    FROM status_date 
     WHERE status='200 OK' 
-    GROUP BY day) AS ok_table,  
-    (SELECT day, count(*) AS error_count 
-    FROM status_days 
+    GROUP BY date) AS ok_table,  
+    (SELECT date, count(*) AS error_count 
+    FROM status_date 
     WHERE status='404 NOT FOUND' 
-    GROUP BY day) AS error_table 
-    WHERE ok_table.day = error_table.day 
-    ORDER BY rate DESC 
+    GROUP BY date) AS error_table 
+    WHERE ok_table.date = error_table.date) AS rates_table 
+    WHERE rate >= 1
     """
-    days_errors = get_query_results(DBNAME, query)
+    date_errors = get_query_results(DBNAME, query)
 
-    for item in days_errors:
-        if item[1] > 1:
-            print("The error rate on July {0}, 2016 was {1:.2f}%".format(int(item[0]), item[1]))
+    for (date, error) in date_errors:
+        print("The error rate on {0} was {1:.2f}%".format(date, error))
 
 
 def main():
