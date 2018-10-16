@@ -24,8 +24,8 @@ def get_most_popular_articles():
     """)
 
     articles = c.fetchall()
-    for i, article in enumerate(articles):
-        print("{0}. '{1}' --- {2} views".format(i + 1, article[0], article[1]))
+    for i, (title, view) in enumerate(articles):
+        print("{0}. '{1}' --- {2} views".format(i + 1, title, view))
 
 
 def get_most_popular_authors():
