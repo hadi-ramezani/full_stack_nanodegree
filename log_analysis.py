@@ -17,7 +17,7 @@ def get_most_popular_articles():
     c = db.cursor()
     c.execute("""
     SELECT articles.title, count(*) AS hit from log, articles
-    WHERE substring(log.path, 10) = articles.slug
+    WHERE '/article/' || articles.slug = log.path 
     GROUP BY articles.title
     ORDER BY hit DESC
     LIMIT 3
@@ -40,7 +40,7 @@ def get_most_popular_authors():
     c = db.cursor()
     c.execute("""
     SELECT authors.name, count(*) AS hit from articles, authors, log
-    WHERE  articles.author = authors.id and substring(log.path, 10) = articles.slug
+    WHERE  articles.author = authors.id and '/article/' || articles.slug = log.path 
     GROUP BY authors.name 
     ORDER BY hit DESC
     LIMIT 3
