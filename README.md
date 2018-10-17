@@ -43,6 +43,8 @@ To run the code and prepare the report, you can do:
 
     python log_analysis.py
 
+A sample output is provided in "sample_output.txt" file
+
 ## Views
 Each question is handled using a separate function in the module. Before you run the code, first create a view using the following command:
 
