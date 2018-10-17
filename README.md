@@ -22,7 +22,7 @@ PostgreSQL
 
 You also need to download the database schema and data using the following this [link](https://d17h27t6h515a5.cloudfront.net/topher/2016/August/57b5f748_newsdata/newsdata.zip)
 
-To make sure the results can be fully reproduced, it is recommended to setup a virtual machine using [VirtualBox](https://www.vagrantup.com/) and [Vagrant](https://www.virtualbox.org/wiki/). This step is optional but highly recommended. You can follow the remaining of this section once you install   VirtualBox and Vagrant.  
+To make sure the results can be fully reproduced, it is recommended to setup a virtual machine using [VirtualBox](https://www.vagrantup.com/) and [Vagrant](https://www.virtualbox.org/wiki/). This step is optional but highly recommended. You can follow the remaining of this section once you install VirtualBox and Vagrant.  
 Use Vagrantfile provided in this project (the owners of this code are @forbiddenvoid @karlud @asparr from Udacity) to setup your environment. Copy this file in your vagrant directory and run:
 
     vagrant up 
