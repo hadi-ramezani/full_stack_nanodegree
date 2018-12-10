@@ -1,0 +1,26 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+	<div class="row divider brown">
+		<div class="col-md-12"></div>
+	</div>
+	<div class="row banner main">
+		<div class="col-md-11 col-md-offset-1 padding-none">
+			<h1>Edit "{{item.name}}"</h1>
+		</div>
+	</div>
+    <form action= "{{url_for('edit_item', category_name=category.name, item_name=item.name)}}" method = 'POST'>
+
+        <label for="name" class="label">Name:</label>
+        <br>
+        <input type = "text" size="70" name="name" placeholder="{{item.name}}">
+
+        <br><br>
+        <label for="description" class="label">Description:</label>
+        <br>
+        <textarea rows="5" cols="70" name="description">{{item.description}}</textarea>
+        <br>
+        <input type='submit' value='Edit'>
+        </form>
+    <a href= '{{url_for('items', category_name=category.name)}}'>Cancel</a>
+{% endblock %}

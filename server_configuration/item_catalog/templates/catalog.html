@@ -1,0 +1,58 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+	<div class="row top-menu">
+		<div class="col-md-10"></div>
+		<div class="col-md-2 text-right">
+					</div>
+	</div>
+	<div class="row divider brown">
+		<div class="col-md-12"></div>
+	</div>
+	<div class="row banner main">
+		<div class="col-md-1"></div>
+		<div class="col-md-11 padding-none">
+            <h1>Catalog App</h1>
+        </div>
+    </div>
+    <div class="flash">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li> <strong> {{message}} </strong></li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+	<div class="row padding-top padding-bottom">
+		<div class="col-md-1"></div>
+		<div class="col-md-10 padding-none">
+			<a href="{{url_for('new_category')}}">
+				<button class="btn btn-default" id="new-category">
+					<span class="glyphicon" aria-hidden="true"></span>Add Category
+				</button>
+			</a>
+		</div>
+		<div class="col-md-1"></div>
+	</div>
+
+    {% for cat in categories %}
+
+        <a href="{{url_for('items', category_name=cat.name)}}">
+			<div class="row">
+				<div class="col-md-1"></div>
+					<div class="col-md-10 category-list">
+						<h3>{{cat.name}}</h3>
+                        {% if not public and cat.user_id == session['user_id'] %}
+                            <a href='{{url_for('edit_category', category_name=cat.name) }}'>Edit | </a>
+                            <a href = '{{url_for('delete_category', category_name=cat.name) }}'>Delete</a>
+                        {% endif %}
+					</div>
+				<div class="col-md-1"></div>
+			</div>
+        </a>
+    {% endfor %}
+{% endblock %}
